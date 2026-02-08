@@ -8,7 +8,13 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
-  background:#020617;
+  background:
+    linear-gradient(rgba(2,6,23,.75), rgba(2,6,23,.75)),
+    url("https://i.imgur.com/azwImAv.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+
   min-height:100vh;
   display:flex;
   align-items:center;
@@ -203,27 +209,47 @@ let state="idle";
   → R = -π/2 - (index*step + step/2)  (mod 2π)
 */
 function spinTo(index,after){
-  let spins = 3 + Math.floor(Math.random()*2); // 3–4 tur
-  const mid = index*step + step/2;
-  const desired = -Math.PI/2 - mid;      // bu dilim tam oka gelsin
-  let target = spins*2*Math.PI + desired;
+  const twoPi = Math.PI * 2;
 
-  let start=rotation;
-  let change=target-start;
-  let dur=4000;
-  let t0=performance.now();
-  spinning=true;
+  // ✅ Her zaman 4–5 tur atsın (2. spin'de de "yavaşça kayma" olmaz)
+  const fullSpins = 4 + Math.floor(Math.random() * 2); // 4 veya 5
+
+  const mid = index * step + step / 2;
+  const desired = -Math.PI/2 - mid; // dilim tam oka gelsin
+
+  // normalize (0..2π)
+  const currentNorm = ((rotation % twoPi) + twoPi) % twoPi;
+  const desiredNorm = ((desired % twoPi) + twoPi) % twoPi;
+
+  // ileri yönde gereken açı (0..2π)
+  let delta = desiredNorm - currentNorm;
+  if (delta < 0) delta += twoPi;
+
+  // hedef: mevcut rotasyondan itibaren -> fullSpins tur + delta
+  const target = rotation + fullSpins * twoPi + delta;
+
+  const start = rotation;
+  const change = target - start;
+
+  const dur = 4200; // biraz daha gerçekçi
+  const t0 = performance.now();
+
+  spinning = true;
   btn.classList.add("disabled");
 
   function animate(t){
-    let p=Math.min((t-t0)/dur,1);
-    let e=1-Math.pow(1-p,3);
-    rotation=start+change*e;
+    const p = Math.min((t - t0) / dur, 1);
+
+    // ✅ daha gerçekçi yavaşlama
+    const e = 1 - Math.pow(1 - p, 4);
+
+    rotation = start + change * e;
     draw();
-    if(p<1){
+
+    if (p < 1){
       requestAnimationFrame(animate);
-    }else{
-      spinning=false;
+    } else {
+      spinning = false;
       btn.classList.remove("disabled");
       after();
     }
