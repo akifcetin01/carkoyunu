@@ -26,10 +26,21 @@ body{
   width:min(460px,95vw);
   padding:20px;
   border-radius:20px;
-  background:rgba(15,23,42,.9);
-  backdrop-filter:blur(10px);
+
+  /* Çok daha transparan */
+  background:rgba(15,23,42,.18);
+
+  /* Blur çok az */
+  backdrop-filter:blur(2px);
+
+  /* Hafif parlak kenar */
+  border:1px solid rgba(255,255,255,.15);
+
+  box-shadow:0 0 40px rgba(0,0,0,.4);
+
   text-align:center
 }
+
 .wheel-box{
   position:relative;
   width:min(340px,80vw);
